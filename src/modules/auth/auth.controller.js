@@ -9,9 +9,12 @@ const googleClient = new OAuth2Client(env.googleClientId);
 
 export const register = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
+    const { name, email, password, passwordConfirmation } = req.body;
+    if (!name || !email || !password || !passwordConfirmation) {
       throw new ApiError(400, "All fields are required");
+    }
+    if (password !== passwordConfirmation) {
+      throw new ApiError(400, "Passwords do not match");
     }
     const isUserExist = await User.findOne({ email });
     if (isUserExist) {
