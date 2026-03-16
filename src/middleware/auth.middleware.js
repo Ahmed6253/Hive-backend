@@ -15,7 +15,6 @@ export const checkAuth = async (req, res, next) => {
     }
 
     const decoded = verifyToken(token);
-    console.log(decoded);
 
     const user = await User.findById(decoded.userId);
     if (!user) {
