@@ -7,7 +7,7 @@ const taskSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    descriptoin: {
+    description: {
       type: String,
       trim: true,
     },
@@ -22,8 +22,8 @@ const taskSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["not-satarted", "in-progress", "completed"],
-      default: "not-satarted",
+      enum: ["not-started", "in-progress", "completed"],
+      default: "not-started",
     },
     difficulty: {
       type: String,
@@ -41,6 +41,6 @@ const taskSchema = new mongoose.Schema(
 
 taskSchema.index({ groupId: 1, status: 1 });
 
-const Task = mongoose.model("User", taskSchema);
+const Task = mongoose.model("Task", taskSchema);
 
 export default Task;

@@ -8,6 +8,8 @@ import env from "./config/env.js";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import dns from "dns";
+import tasksRoutes from "./modules/tasks/tasks.routes.js";
+import groupRoutes from "./modules/groups/group.routes.js";
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
@@ -25,7 +27,8 @@ app.use(cors({ origin: env.frontBaseUrl, credentials: true }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
-app.use("/spi/tasks", tasksRoutes);
+app.use("/api/groups", groupRoutes);
+app.use("/api/tasks", tasksRoutes);
 
 app.use(errorMiddleware);
 
