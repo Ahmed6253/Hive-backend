@@ -25,6 +25,7 @@ app.use(cors({ origin: env.frontBaseUrl, credentials: true }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
+app.use("/spi/tasks", tasksRoutes);
 
 app.use(errorMiddleware);
 
