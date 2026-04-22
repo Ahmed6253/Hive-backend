@@ -1,8 +1,50 @@
 import ApiError from "../../utils/ApiError.js";
 import Task from "./tasks.model.js";
 
+export const get = async (req, res, next) => {
+  const userId = req.user._id;
+
+  try {
+    const result = await Task.aggregate([
+      { $match: { userId } },
+      {
+        $lookup: {
+          from: "groups",
+          localField: "groupId",
+          foreignField: "_id",
+          as: "group",
+        },
+      },
+      { $unwind: "$group" },
+      {
+        $group: {
+          _id: "$groupId",
+          name: { $first: "$group.name" },
+          description: { $first: "$group.description" },
+          icon: { $first: "$group.icon" },
+          tasks: { $push: "$$ROOT" },
+        },
+      },
+    ]);
+
+    const grouped = result.reduce((acc, group) => {
+      acc[group._id.toString()] = {
+        name: group.name,
+        color: group.color,
+        tasks: group.tasks,
+      };
+      return acc;
+    }, {});
+
+    res.status(200).json(grouped);
+  } catch (error) {
+    next(new ApiError(500, "Error getting task"));
+  }
+};
+
 export const create = async (req, res, next) => {
   const { name, description, dueDate, status, difficulty, groupId } = req.body;
+  const userId = req.user._id;
   if (!name || !status || difficulty) {
     return next(new ApiError(400, "Some fildes are missing"));
   }
@@ -17,6 +59,7 @@ export const create = async (req, res, next) => {
       status,
       difficulty,
       groupId,
+      userId,
     });
     await newTask.save();
     res.status(201).json(newTask);
@@ -40,7 +83,8 @@ export const remove = async (req, res, next) => {
   }
 };
 export const edit = async (req, res, next) => {
-  const { id, name, description, dueDate, status, difficulty } = req.body;
+  const { id, name, description, dueDate, status, difficulty, groupId } =
+    req.body;
   if (!id) {
     return next(new ApiError(400, "TaskId is required"));
   }

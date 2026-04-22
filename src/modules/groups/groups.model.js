@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const groupSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -19,6 +24,8 @@ const groupSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+groupSchema.index({ userId: 1 });
 
 const Group = mongoose.model("Group", groupSchema);
 

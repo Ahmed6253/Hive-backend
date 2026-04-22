@@ -14,7 +14,7 @@ const authRoutes = Router();
 authRoutes.post("/register", register);
 authRoutes.post("/login", login);
 authRoutes.post("/google", googleAuth);
-authRoutes.delete("/logout", logout, getUser);
+authRoutes.delete("/logout", logout);
 
 authRoutes.get("/check", checkAuth, getUser);
 

@@ -26,20 +26,25 @@ const taskSchema = new mongoose.Schema(
       default: "not-started",
     },
     difficulty: {
-      type: String,
-      enum: ["easy", "medium", "hard"],
-      default: "medium",
+      type: Number,
+      enum: [1, 2, 3],
+      default: 2,
     },
     groupId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Group",
       required: true,
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timestamps: true },
 );
 
-taskSchema.index({ groupId: 1, status: 1 });
+taskSchema.index({ userId: 1, groupId: 1 });
 
 const Task = mongoose.model("Task", taskSchema);
 

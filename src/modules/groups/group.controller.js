@@ -1,8 +1,19 @@
 import ApiError from "../../utils/ApiError.js";
-import Task from "./groups.model.js";
+import Group from "./groups.model.js";
+
+export const get = async (req, res, next) => {
+  const userId = req.user._id;
+  try {
+    const groups = await Group.find({ userId });
+    res.status(200).json(groups);
+  } catch (error) {
+    next(new ApiError(500, "Error getting groups"));
+  }
+};
 
 export const create = async (req, res, next) => {
-  const { name, description } = req.body;
+  const { name, description, icon } = req.body;
+  const userId = req.user._id;
   if (!name) {
     return next(new ApiError(400, "Name is required"));
   }
@@ -10,9 +21,11 @@ export const create = async (req, res, next) => {
     return next(new ApiError(400, "Description is required"));
   }
   try {
-    const newGroup = new Task({
+    const newGroup = new group({
       name,
       description,
+      icon,
+      userId,
     });
     await newGroup.save();
     res.status(201).json(newGroup);
@@ -26,7 +39,7 @@ export const remove = async (req, res, next) => {
     return next(new ApiError(400, "groupId is required"));
   }
   try {
-    const deletedGroup = await Task.findByIdAndDelete(id);
+    const deletedGroup = await Group.findByIdAndDelete(id);
     if (!deletedGroup) {
       return next(new ApiError(404, "Group not found"));
     }
@@ -36,17 +49,17 @@ export const remove = async (req, res, next) => {
   }
 };
 export const edit = async (req, res, next) => {
-  const { id, name, description } = req.body;
+  const { id, name, description, icon } = req.body;
   if (!id) {
     return next(new ApiError(400, "groupId is required"));
   }
-  if (!name && !description) {
+  if (!name && !icon) {
     return next(new ApiError(400, "Some fields are missing"));
   }
   try {
     const updatedGroup = await Task.findByIdAndUpdate(
       id,
-      { name, description },
+      { name, description, icon },
       { new: true },
     );
     if (!updatedGroup) {
