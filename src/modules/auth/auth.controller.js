@@ -2,6 +2,7 @@ import { OAuth2Client } from "google-auth-library";
 import User from "../user/user.model.js";
 import { generateToken } from "../../utils/Jwt.js";
 import ApiError from "../../utils/ApiError.js";
+import ApiResponse from "../../utils/ApiResponse.js";
 import env from "../../config/env.js";
 import bcrypt from "bcrypt";
 
@@ -32,16 +33,17 @@ export const register = async (req, res, next) => {
     });
     await newUser.save();
     generateToken(newUser._id, res);
-    res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      user: {
+    new ApiResponse(
+      201,
+      {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
         authProvider: newUser.authProvider,
       },
-    });
+      "User registered successfully",
+      "user",
+    ).send(res);
   } catch (error) {
     next(error);
   }
@@ -62,16 +64,17 @@ export const login = async (req, res, next) => {
       throw new ApiError(401, "Invalid credentials");
     }
     generateToken(user._id, res);
-    res.status(200).json({
-      success: true,
-      message: "Login successful",
-      user: {
+    new ApiResponse(
+      200,
+      {
         id: user._id,
         name: user.name,
         email: user.email,
         authProvider: user.authProvider,
       },
-    });
+      "Login successful",
+      "user",
+    ).send(res);
   } catch (error) {
     next(error);
   }
@@ -107,36 +110,43 @@ export const googleAuth = async (req, res, next) => {
       await user.save();
     }
     generateToken(user._id, res);
-    res.status(200).json({
-      success: true,
-      message: "Google authentication successful",
-      user: {
+    new ApiResponse(
+      200,
+      {
         id: user._id,
         name: user.name,
         email: user.email,
         authProvider: user.authProvider,
       },
-    });
+      "Google authentication successful",
+    ).send(res);
   } catch (error) {
     next(error);
   }
 };
 
-export const getUser = async (req, res) => {
-  res.json({
-    user: {
-      id: req.user._id,
-      name: req.user.name,
-      email: req.user.email,
-      authProvider: req.user.authProvider,
-    },
-  });
+export const getUser = async (req, res, next) => {
+  try {
+    new ApiResponse(
+      200,
+      {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        authProvider: req.user.authProvider,
+      },
+      "User data retrieved successfully",
+      "user",
+    ).send(res);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const logout = (req, res, next) => {
   try {
     res.cookie("jwt", "", { maxAge: 0 });
-    res.status(200).json({ message: "Logout successful" });
+    new ApiResponse(200, { message: "Logout successful" }).send(res);
   } catch (error) {
     next(error);
   }

@@ -1,3 +1,5 @@
+import ApiResponse from "../utils/ApiResponse.js";
+
 const errorMiddleware = (err, req, res, next) => {
   const statusCode = err.statusCode || 500;
 
@@ -7,11 +9,11 @@ const errorMiddleware = (err, req, res, next) => {
   console.error(`Stack: ${err.stack}`);
   console.error("---");
 
-  res.status(statusCode).json({
+  new ApiResponse(
     statusCode,
-    success: false,
-    message: statusCode === 500 ? "Internal Server Error " : err.message,
-  });
+    null,
+    statusCode === 500 ? "Internal Server Error" : err.message,
+  ).send(res);
 };
 
 export default errorMiddleware;

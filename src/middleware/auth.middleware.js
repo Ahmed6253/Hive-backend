@@ -1,4 +1,5 @@
 import User from "../modules/user/user.model.js";
+import ApiError from "../utils/ApiError.js";
 import { verifyToken } from "../utils/Jwt.js";
 
 export const checkAuth = async (req, res, next) => {
@@ -9,16 +10,14 @@ export const checkAuth = async (req, res, next) => {
       ?.split("=")[1];
 
     if (!token) {
-      return res
-        .status(401)
-        .json({ message: "Not authorized. No token provided." });
+      throw new ApiError(401, "Authentication token is missing.");
     }
 
     const decoded = verifyToken(token);
 
     const user = await User.findById(decoded.userId);
     if (!user) {
-      return res.status(401).json({ message: "User no longer exists." });
+      throw new ApiError(401, "User not found.");
     }
 
     req.user = user;

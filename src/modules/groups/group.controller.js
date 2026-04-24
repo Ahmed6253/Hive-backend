@@ -1,11 +1,17 @@
 import ApiError from "../../utils/ApiError.js";
+import ApiResponse from "../../utils/ApiResponse.js";
 import Group from "./groups.model.js";
 
 export const get = async (req, res, next) => {
   const userId = req.user._id;
   try {
     const groups = await Group.find({ userId });
-    res.status(200).json(groups);
+    new ApiResponse(
+      200,
+      groups,
+      "Groups retrieved successfully",
+      "groups",
+    ).send(res);
   } catch (error) {
     next(new ApiError(500, "Error getting groups"));
   }
@@ -21,14 +27,16 @@ export const create = async (req, res, next) => {
     return next(new ApiError(400, "Description is required"));
   }
   try {
-    const newGroup = new group({
+    const newGroup = new Group({
       name,
       description,
       icon,
       userId,
     });
     await newGroup.save();
-    res.status(201).json(newGroup);
+    new ApiResponse(201, newGroup, "Group created successfully", "group").send(
+      res,
+    );
   } catch (error) {
     next(new ApiError(500, "Error creating group"));
   }
@@ -43,7 +51,7 @@ export const remove = async (req, res, next) => {
     if (!deletedGroup) {
       return next(new ApiError(404, "Group not found"));
     }
-    res.status(200).json({ message: "Group deleted successfully" });
+    new ApiResponse(200, { message: "Group deleted successfully" }).send(res);
   } catch (error) {
     next(new ApiError(500, "Error deleting group"));
   }
@@ -57,7 +65,7 @@ export const edit = async (req, res, next) => {
     return next(new ApiError(400, "Some fields are missing"));
   }
   try {
-    const updatedGroup = await Task.findByIdAndUpdate(
+    const updatedGroup = await Group.findByIdAndUpdate(
       id,
       { name, description, icon },
       { new: true },
@@ -65,7 +73,12 @@ export const edit = async (req, res, next) => {
     if (!updatedGroup) {
       return next(new ApiError(404, "Group not found"));
     }
-    res.status(200).json(updatedGroup);
+    new ApiResponse(
+      200,
+      updatedGroup,
+      "Group updated successfully",
+      "group",
+    ).send(res);
   } catch (error) {
     next(new ApiError(500, "Error updating group"));
   }
