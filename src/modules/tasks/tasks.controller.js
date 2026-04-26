@@ -90,6 +90,8 @@ export const create = async (req, res, next) => {
       res,
     );
   } catch (error) {
+    console.log(error);
+
     next(new ApiError(500, "Error creating task"));
   }
 };
@@ -126,7 +128,7 @@ export const edit = async (req, res, next) => {
     const updatedTask = await Task.findByIdAndUpdate(
       id,
       { name, description, dueDate, status, difficulty },
-      { new: true },
+      { returnDocument: "after" },
     );
     if (!updatedTask) {
       return next(new ApiError(404, "Task not found"));
