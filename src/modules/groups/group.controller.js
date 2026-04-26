@@ -1,5 +1,6 @@
 import ApiError from "../../utils/ApiError.js";
 import ApiResponse from "../../utils/ApiResponse.js";
+import Task from "../tasks/tasks.model.js";
 import Group from "./groups.model.js";
 
 export const get = async (req, res, next) => {
@@ -48,10 +49,14 @@ export const remove = async (req, res, next) => {
   }
   try {
     const deletedGroup = await Group.findByIdAndDelete(id);
+    const tasks = await Task.deleteMany({ groupId: id });
+
     if (!deletedGroup) {
       return next(new ApiError(404, "Group not found"));
     }
-    new ApiResponse(200, { message: "Group deleted successfully" }).send(res);
+    new ApiResponse(200, {
+      message: `Group deleted successfully with ${tasks.deletedCount} tasks`,
+    }).send(res);
   } catch (error) {
     next(new ApiError(500, "Error deleting group"));
   }

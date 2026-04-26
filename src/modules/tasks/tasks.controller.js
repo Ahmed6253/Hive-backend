@@ -1,4 +1,4 @@
-import { id } from "zod/locales";
+import Group from "../groups/groups.model.js";
 import ApiError from "../../utils/ApiError.js";
 import ApiResponse from "../../utils/ApiResponse.js";
 import Task from "./tasks.model.js";
@@ -7,37 +7,43 @@ export const get = async (req, res, next) => {
   const userId = req.user._id;
 
   try {
-    const result = await Task.aggregate([
-      { $match: { userId } },
+    const result = await Group.aggregate([
+      { $match: { userId } }, // if groups are user-specific
+
       {
         $lookup: {
-          from: "groups",
-          localField: "groupId",
-          foreignField: "_id",
-          as: "group",
+          from: "tasks",
+          localField: "_id",
+          foreignField: "groupId",
+          as: "tasks",
         },
       },
-      { $unwind: "$group" },
+
       {
-        $group: {
-          _id: "$groupId",
-          name: { $first: "$group.name" },
-          description: { $first: "$group.description" },
-          icon: { $first: "$group.icon" },
+        $project: {
+          id: "$_id",
+          name: 1,
+          description: 1,
+          icon: 1,
           tasks: {
-            $push: {
-              id: "$_id",
-              name: "$name",
-              description: "$description",
-              dueDate: "$dueDate",
-              status: "$status",
-              difficulty: "$difficulty",
-              createdAt: "$createdAt",
-              updatedAt: "$updatedAt",
+            $map: {
+              input: "$tasks",
+              as: "task",
+              in: {
+                id: "$$task._id",
+                name: "$$task.name",
+                description: "$$task.description",
+                dueDate: "$$task.dueDate",
+                status: "$$task.status",
+                difficulty: "$$task.difficulty",
+                createdAt: "$$task.createdAt",
+                updatedAt: "$$task.updatedAt",
+              },
             },
           },
         },
       },
+
       { $sort: { _id: -1 } },
     ]);
 
