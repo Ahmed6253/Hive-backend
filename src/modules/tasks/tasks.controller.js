@@ -75,6 +75,9 @@ export const create = async (req, res, next) => {
   if (!groupId) {
     return next(new ApiError(400, "GroupId is required"));
   }
+  if (dueDate && dueDate < new Date().toISOString()) {
+    return next(new ApiError(400, "Due date cannot be before current date"));
+  }
   try {
     const newTask = new Task({
       name,
