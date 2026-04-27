@@ -35,6 +35,7 @@ export const get = async (req, res, next) => {
                 description: "$$task.description",
                 dueDate: "$$task.dueDate",
                 status: "$$task.status",
+                sortOrder: "$$task.sortOrder",
                 difficulty: "$$task.difficulty",
                 createdAt: "$$task.createdAt",
                 updatedAt: "$$task.updatedAt",
@@ -141,5 +142,30 @@ export const edit = async (req, res, next) => {
     );
   } catch (error) {
     next(new ApiError(500, "Error updating task"));
+  }
+};
+
+export const sort = async (req, res, next) => {
+  const updated = req.body;
+  if (updated.length === 0) {
+    return next(new ApiError(400, "No tasks to sort"));
+  }
+  try {
+    await Task.bulkManyWrite(
+      updated.map((task) => ({
+        updateOne: {
+          filter: { _id: task.id },
+          update: { sortOrder: task.sortOrder },
+        },
+      })),
+    );
+    new ApiResponse(
+      200,
+      { message: "Tasks sorted successfully" },
+      "Tasks sorted successfully",
+      "tasks",
+    ).send(res);
+  } catch (error) {
+    next(new ApiError(500, "Error sorting tasks"));
   }
 };

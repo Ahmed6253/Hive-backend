@@ -23,7 +23,7 @@ app.use(cors({ origin: env.frontBaseUrl, credentials: true }));
 app.use(cookieParser());
 
 app.set("etag", false);
-app.use(limiter);
+// app.use(limiter);
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ limit: "5mb", extended: true }));
 

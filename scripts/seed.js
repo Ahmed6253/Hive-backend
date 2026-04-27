@@ -8,92 +8,74 @@ const tasksData = [
   {
     name: "Finish project report",
     description: "Complete the Q1 project report",
-    difficulty: 2,
   },
   {
     name: "Email client updates",
     description: "Send weekly updates to client",
-    difficulty: 1,
   },
   {
     name: "Team meeting preparation",
     description: "Prepare slides for team meeting",
-    difficulty: 3,
   },
   {
     name: "Review code submissions",
     description: "Review pull requests from team",
-    difficulty: 2,
   },
   {
     name: "Study algorithms",
     description: "Practice dynamic programming problems",
-    difficulty: 3,
   },
   {
     name: "Read research papers",
     description: "Read latest ML research papers",
-    difficulty: 2,
   },
   {
     name: "Complete exercises",
     description: "Finish coding exercises",
-    difficulty: 1,
   },
   {
     name: "Watch lecture videos",
     description: "Watch advanced math lectures",
-    difficulty: 2,
   },
   {
     name: "Morning workout",
     description: "30 min cardio session",
-    difficulty: 1,
   },
   {
     name: "Healthy meal prep",
     description: "Prepare meals for the week",
-    difficulty: 2,
   },
   {
     name: "Meditation",
     description: "15 min mindfulness practice",
-    difficulty: 1,
   },
   {
     name: "Checkup appointment",
     description: "Annual doctor checkup",
-    difficulty: 3,
   },
   {
     name: "Pay bills",
     description: "Pay monthly utility bills",
-    difficulty: 1,
   },
   {
     name: "Review investments",
     description: "Check portfolio performance",
-    difficulty: 2,
   },
   {
     name: "Practice guitar scales",
     description: "Practice C major scale",
-    difficulty: 2,
   },
   {
     name: "Learn new song",
     description: "Learn chorus of new song",
-    difficulty: 3,
   },
   {
     name: "Listen to music theory",
     description: "Complete music theory course",
-    difficulty: 1,
   },
   {
     name: "Clean guitar",
     description: "Maintain and clean guitar",
-    difficulty: 1,
   },
   { name: "Jam session", description: "Practice with friends", difficulty: 2 },
 ];
@@ -202,8 +184,9 @@ const seed = async () => {
             name: task.name,
             description: task.description,
             status: randomFrom(statuses),
-            difficulty: task.difficulty,
+            difficulty: randomFrom(difficulties),
             dueDate: randomDueDate(),
+            sortOrder: j,
           });
         }
 
